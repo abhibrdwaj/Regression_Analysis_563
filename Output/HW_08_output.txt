@@ -1,0 +1,183 @@
+> # HW_08.R based on problem 13.7
+> # Data we will be using is p13_7modified.csv
+> 
+> # Load libraries
+> library(faraway)
+> library(olsrr)
+
+Attaching package: ‘olsrr’
+
+The following object is masked from ‘package:faraway’:
+
+    hsb
+
+The following object is masked from ‘package:datasets’:
+
+    rivers
+
+> library(epiDisplay)
+Loading required package: foreign
+Loading required package: survival
+
+Attaching package: ‘survival’
+
+The following objects are masked from ‘package:faraway’:
+
+    rats, solder
+
+Loading required package: MASS
+
+Attaching package: ‘MASS’
+
+The following object is masked from ‘package:olsrr’:
+
+    cement
+
+Loading required package: nnet
+> 
+> # Defining dataset
+> p13_7 <- read.csv(file="./Documents/Rutgers/RegressionAnalysis/Data/p13_7modified.csv", header = TRUE)
+> p13_7
+   y  x1 x2  x3   x4
+1  1  50 70  52  1.0
+2  1 230 65  42  6.9
+3  0 125 70  45  1.0
+4  1  75 65  68  0.5
+5  1  70 65  53  0.5
+6  1  65 70  46  3.0
+7  0  65 60  62  1.0
+8  0 350 60  54  0.5
+9  1 350 90  54  0.5
+10 1 160 80  38  0.0
+11 1 145 65  38 10.0
+12 1 145 85  38  0.0
+13 1 180 70  42  2.0
+14 1  43 80  40  0.0
+15 1  42 85  51 12.0
+16 1  42 85  51  0.0
+17 1  45 85  42  0.0
+18 1  83 85  48 10.0
+19 0 300 65  68 10.0
+20 1 190 90  84  6.0
+21 1 145 90  54 12.0
+22 1 510 80  57 10.0
+23 1  65 75  68  5.0
+24 1 470 90  90  9.0
+25 1 300 80 165  9.0
+26 1 275 90  40  4.0
+27 0 420 50  44 17.0
+28 1  65 80  48 15.0
+29 1  40 75  51 15.0
+30 1 900 90  48 35.0
+31 1  95 88  36 20.0
+32 1  40 85  57 10.0
+33 1 140 90  38  7.0
+34 0 150 50  44  5.0
+35 0  80 60  96  5.0
+36 1  80 85  96  5.0
+37 0 145 65  72  9.0
+38 0 100 65  72  9.0
+39 1 150 80  48  3.0
+40 1 150 80  48  0.0
+41 1 210 75  42  2.0
+42 1  11 75  42  0.0
+43 0 100 65  60 25.0
+44 1  50 88  60 25.0
+> summary(p13_7)
+       y                x1              x2              x3               x4        
+ Min.   :0.0000   Min.   : 11.0   Min.   :50.00   Min.   : 36.00   Min.   : 0.000  
+ 1st Qu.:1.0000   1st Qu.: 65.0   1st Qu.:65.00   1st Qu.: 42.00   1st Qu.: 0.875  
+ Median :1.0000   Median :132.5   Median :80.00   Median : 51.00   Median : 5.000  
+ Mean   :0.7727   Mean   :169.2   Mean   :75.93   Mean   : 56.64   Mean   : 7.293  
+ 3rd Qu.:1.0000   3rd Qu.:195.0   3rd Qu.:85.00   3rd Qu.: 60.50   3rd Qu.:10.000  
+ Max.   :1.0000   Max.   :900.0   Max.   :90.00   Max.   :165.00   Max.   :35.000  
+> 
+> #save graph in pdf
+> pdf(file="./Documents/Rutgers/RegressionAnalysis/Output/HW_08_fig.pdf")
+> pairs(~ y+x1+x2+x3+x4, data=p13_7)
+> 
+> # a. Fit a logistic regression model to the data.
+> glmod <- glm(y ~ x1 + x2 + x3 + x4, data = p13_7, family = binomial)
+> summary(glmod)
+
+Call:
+glm(formula = y ~ x1 + x2 + x3 + x4, family = binomial, data = p13_7)
+
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)  
+(Intercept) -26.126980  11.434606  -2.285   0.0223 *
+x1           -0.002629   0.007704  -0.341   0.7329  
+x2            0.447578   0.190867   2.345   0.0190 *
+x3           -0.036801   0.030883  -1.192   0.2334  
+x4           -0.108837   0.124053  -0.877   0.3803  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 47.164  on 43  degrees of freedom
+Residual deviance: 14.036  on 39  degrees of freedom
+AIC: 24.036
+
+Number of Fisher Scoring iterations: 8
+
+> 
+> # b.Test H0: all Beta-parameters are 0 versus at least one Beta-parameter is not 0.
+> # Fit the null model
+> null_mod <- glm(y ~ 1, data = p13_7, family = binomial)
+> summary(null_mod)
+
+Call:
+glm(formula = y ~ 1, family = binomial, data = p13_7)
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   1.2238     0.3597   3.402 0.000669 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 47.164  on 43  degrees of freedom
+Residual deviance: 47.164  on 43  degrees of freedom
+AIC: 49.164
+
+Number of Fisher Scoring iterations: 4
+
+> # Perform global test on parameters using the likelihood ratio test
+> lrtest_res <- lrtest(null_mod, glmod)
+> print(lrtest_res)
+Likelihood ratio test for MLE method 
+Chi-squared 4 d.f. =  33.12883 , P value =  1.124085e-06 
+
+> 
+> # c. Plot the observed binary responses versus the fitted values.
+> fitted_values <- fitted(glmod)
+> plot(p13_7$y, fitted_values, xlab = "Observed Binary Responses", ylab = "Fitted Values", main = "Observed vs Fitted Values")
+> abline(0, 1, col = "red")
+> 
+> # d. Use the logistic.display function found in the epiDisplay library to show 
+> # statistics for each individual parameter from the logistic regression performed in part a
+> logistic.display(glmod)
+
+Logistic regression predicting y 
+ 
+                crude OR(95%CI)         adj. OR(95%CI)          P(Wald's test) P(LR-test)
+x1 (cont. var.) 0.9994 (0.9953,1.0034)  0.9974 (0.9824,1.0125)  0.733          0.729     
+                                                                                         
+x2 (cont. var.) 1.53 (1.06,2.23)        1.56 (1.08,2.27)        0.019          < 0.001   
+                                                                                         
+x3 (cont. var.) 0.99 (0.96,1.02)        0.96 (0.91,1.02)        0.233          0.256     
+                                                                                         
+x4 (cont. var.) 0.98 (0.9,1.07)         0.9 (0.7,1.14)          0.38           0.315     
+                                                                                         
+Log-likelihood = -7.0178
+No. of observations = 44
+AIC value = 24.0356
+
+> 
+> dev.off()
+null device 
+          1 
+> 
+> 

@@ -1,0 +1,215 @@
+> #HW04_p3_8.R Problem 3.8 B5.csv data
+> 
+> library(faraway)
+> library(olsrr)
+> 
+> p3_8 <- read.csv(file="./Documents/Rutgers/RegressionAnalysis/Data/B5.csv",header = TRUE)
+> head(p3_8)
+      y   x1  x2    x3    x4      x5      x6   x7
+1 36.98  5.1 400 51.37  4.24 1484.83 2227.25 2.06
+2 13.74 26.4 400 72.33 30.87  289.94  434.90 1.33
+3 10.08 23.8 400 71.44 33.01  320.79  481.19 0.97
+4  8.53 46.4 400 79.15 44.61  164.76  247.14 0.62
+5 36.42  7.0 450 80.47 33.84 1097.26 1645.89 0.22
+6 26.59 12.6 450 89.90 41.26  605.06  907.59 0.76
+> str(p3_8)
+'data.frame':	27 obs. of  8 variables:
+ $ y : num  36.98 13.74 10.08 8.53 36.42 ...
+ $ x1: num  5.1 26.4 23.8 46.4 7 12.6 18.9 30.2 53.8 5.6 ...
+ $ x2: int  400 400 400 400 450 450 450 450 450 400 ...
+ $ x3: num  51.4 72.3 71.4 79.2 80.5 ...
+ $ x4: num  4.24 30.87 33.01 44.61 33.84 ...
+ $ x5: num  1485 290 321 165 1097 ...
+ $ x6: num  2227 435 481 247 1646 ...
+ $ x7: num  2.06 1.33 0.97 0.62 0.22 0.76 1.71 3.93 1.97 5.08 ...
+> 
+> #save graph in pdf
+> pdf(file="./Documents/Rutgers/RegressionAnalysis/Output/HW04_fig.pdf")
+> pairs(~ y+x6+x7, data=p3_8)
+> 
+> # a: Fit a multiple regression model relating CO2 product (y) to total solvent (x6) and hydrogen consumption (x7).
+> 
+> lmod <- lm(y ~ x6 + x7, data = p3_8)
+> lmod_summary <- summary(lmod)
+> (lmod_olsrr = ols_regress(y ~ x6 + x7,data=p3_8))
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.836       RMSE                 9.357 
+R-Squared               0.700       MSE                 98.493 
+Adj. R-Squared          0.675       Coef. Var           40.130 
+Pred R-Squared          0.569       AIC                205.372 
+MAE                     6.834       SBC                210.556 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                               ANOVA                                 
+--------------------------------------------------------------------
+                Sum of                                              
+               Squares        DF    Mean Square      F         Sig. 
+--------------------------------------------------------------------
+Regression    5506.277         2       2753.138    27.953    0.0000 
+Residual      2363.835        24         98.493                     
+Total         7870.112        26                                    
+--------------------------------------------------------------------
+
+                                 Parameter Estimates                                  
+-------------------------------------------------------------------------------------
+      model     Beta    Std. Error    Std. Beta      t       Sig      lower    upper 
+-------------------------------------------------------------------------------------
+(Intercept)    2.526         3.610                 0.700    0.491    -4.924    9.977 
+         x6    0.019         0.003        0.762    6.742    0.000     0.013    0.024 
+         x7    2.186         0.973        0.254    2.247    0.034     0.178    4.193 
+-------------------------------------------------------------------------------------
+> 
+> # Part b: Test for significance of regression
+> # Calculate R-squared and adjusted R-squared
+> anova(lmod)
+Analysis of Variance Table
+
+Response: y
+          Df Sum Sq Mean Sq F value    Pr(>F)    
+x6         1 5008.9  5008.9 50.8557 2.267e-07 ***
+x7         1  497.3   497.3  5.0495    0.0341 *  
+Residuals 24 2363.8    98.5                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> 
+> lmod_summary$r.squared
+[1] 0.699644
+> lmod_summary$adj.r.squared
+[1] 0.6746144
+> 
+> lmod_olsrr$rsq
+[1] 0.699644
+> lmod_olsrr$adjr
+[1] 0.6746144
+> 
+> 
+> # Part c: Using t tests determine the contribution of x6 and x7 to the model.
+> 
+> lmod_summary
+
+Call:
+lm(formula = y ~ x6 + x7, data = p3_8)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-23.2035  -4.3713   0.2513   4.9339  21.9682 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 2.526460   3.610055   0.700   0.4908    
+x6          0.018522   0.002747   6.742 5.66e-07 ***
+x7          2.185753   0.972696   2.247   0.0341 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 9.924 on 24 degrees of freedom
+Multiple R-squared:  0.6996,	Adjusted R-squared:  0.6746 
+F-statistic: 27.95 on 2 and 24 DF,  p-value: 5.391e-07
+
+> 
+> # Part d: Construct 95% CIs on β6 and β7.
+> 
+> ci_lmod <- confint(lmod)
+> ci_lmod
+                  2.5 %     97.5 %
+(Intercept) -4.92432697 9.97724714
+x6           0.01285196 0.02419204
+x7           0.17820756 4.19329833
+> 
+> # Part e:  Refit the model using only x6 as the regressor. Test for significance of
+> # regression and calculate R2 and R2 . Discuss your findings. Based on these Adj statistics
+> # are you satisfied with this model?
+> 
+> lmod_refit <-  lm(y ~ x6, data = p3_8)
+> refit_summary <- summary(lmod_refit)
+> 
+> # Plot the graph for refitted model y vs x6
+> plot(y ~ x6, data=p3_8)
+> abline(lmod_refit)
+> 
+> refit_summary
+
+Call:
+lm(formula = y ~ x6, data = p3_8)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-28.081  -5.829  -0.839   5.522  26.882 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 6.144181   3.483064   1.764   0.0899 .  
+x6          0.019395   0.002932   6.616 6.24e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 10.7 on 25 degrees of freedom
+Multiple R-squared:  0.6365,	Adjusted R-squared:  0.6219 
+F-statistic: 43.77 on 1 and 25 DF,  p-value: 6.238e-07
+
+> 
+> refit_summary$r.squared
+[1] 0.6364504
+> refit_summary$adj.r.squared
+[1] 0.6219084
+>
+> # Reason : Both the R2 and R2_adj for the refitted model with only x6 is reduced from the original model
+> # This implies us that, the adding x7 to the refitted model, would contribute more significantly towards
+> # the variation in the CO2 product(y)
+> 
+> # Part f: Construct a 95% CI on β6 using the model with only x6
+> # Compare the length of this CI to the length of the CI in part d.
+> # Does this tell you anything important about the contribution of x7 to the model?
+> 
+> ci_refit <- confint(lmod_refit)
+> 
+> length_ci_lmod <- diff(ci_lmod["x6", ])
+> length_ci_refit <- diff(ci_refit["x6", ])
+> 
+> length_ci_lmod
+    97.5 % 
+0.01134009 
+> length_ci_refit
+    97.5 % 
+0.01207573
+>
+> # Interpretation : The CI width for the original model is narrower than the refitted model, this implies
+> # that the regressor x7 stabilizes the estimation of betas much more than x6 alone. Removing x7 from the model
+> # would significantly increase the uncertainty in estimations.
+>
+> # Part g: Compare MS_res for the two models
+> # How did the MSRes change when you removed x7 from the model?
+> # Does this tell you anything about the contribution of x7 to the model?
+> 
+> lmod$residuals
+           1            2            3            4            5            6            7            8            9           10 
+-11.30223557   0.25127071  -3.47924160   0.07084602   2.92749975   5.59198573   1.54360030 -12.20501625   4.73501182   5.13280110 
+          11           12           13           14           15           16           17           18           19           20 
+  8.77795562   5.81550149  -1.30468019   2.61388620  18.16741725   0.44334932 -23.20353088  13.57543858  -8.40089869  -2.64550949 
+          21           22           23           24           25           26           27 
+ -3.18755878  -2.42483485  -5.56530869  -5.26338512 -13.27805915  21.96818017   0.64551521 
+> 
+> msres_lmod <- sum(lmod$residuals^2) / lmod$df.residual
+> msres_refit <- sum(lmod_refit$residuals^2) / lmod_refit$df.residual
+> 
+> msres_lmod
+[1] 98.49313
+> msres_refit
+[1] 114.447
+> 
+> # The mean square error is lesser for the original model than when we remove x7 from it(refitted model)
+> # indicates that the original model provides a better fit to the data. This suggests that x7(hydrogen consumption)
+> # is an important predictor that contributes to explaining the variability in the CO2 product, which is the significance
+> # of including relevant predictors to have a more accurate and reliable model.
+>
+> dev.off()
+null device 
+          1 
+> 
+> 

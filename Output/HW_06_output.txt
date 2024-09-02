@@ -1,0 +1,254 @@
+> # HW_06.R based on problem 4.2
+> # Data we will be using is B1.csv based on NFL data in p3_1
+> 
+> # Load libraries
+> library(faraway)
+> library(olsrr)
+> library(car)
+> 
+> # Defining dataset
+> p3_1 <- read.csv(file="./Documents/Rutgers/RegressionAnalysis/Data/B1.csv",header = TRUE)
+> p3_1
+    y   x1   x2   x3   x4  x5   x6   x7   x8   x9
+1  10 2113 1985 38.9 64.7   4  868 59.7 2205 1917
+2  11 2003 2855 38.8 61.3   3  615 55.0 2096 1575
+3  11 2957 1737 40.1 60.0  14  914 65.6 1847 2175
+4  13 2285 2905 41.6 45.3  -4  957 61.4 1903 2476
+5  10 2971 1666 39.2 53.8  15  836 66.1 1457 1866
+6  11 2309 2927 39.7 74.1   8  786 61.0 1848 2339
+7  10 2528 2341 38.1 65.4  12  754 66.1 1564 2092
+8  11 2147 2737 37.0 78.3  -1  761 58.0 1821 1909
+9   4 1689 1414 42.1 47.6  -3  714 57.0 2577 2001
+10  2 2566 1838 42.3 54.2  -1  797 58.9 2476 2254
+11  7 2363 1480 37.3 48.0  19  984 67.5 1984 2217
+12 10 2109 2191 39.5 51.9   6  700 57.2 1917 1758
+13  9 2295 2229 37.4 53.6  -5 1037 58.8 1761 2032
+14  9 1932 2204 35.1 71.4   3  986 58.6 1709 2025
+15  6 2213 2140 38.8 58.3   6  819 59.2 1901 1686
+16  5 1722 1730 36.6 52.6 -19  791 54.4 2288 1835
+17  5 1498 2072 35.3 59.3  -5  776 49.6 2072 1914
+18  5 1873 2929 41.1 55.3  10  789 54.3 2861 2496
+19  6 2118 2268 38.2 69.6   6  582 58.7 2411 2670
+20  4 1775 1983 39.3 78.3   7  901 51.7 2289 2202
+21  3 1904 1792 39.7 38.1  -9  734 61.9 2203 1988
+22  3 1929 1606 39.7 68.8 -21  627 52.7 2592 2324
+23  4 2080 1492 35.5 68.8  -8  722 57.8 2053 2550
+24 10 2301 2835 35.3 74.1   2  683 59.7 1979 2110
+25  6 2040 2416 38.7 50.0   0  576 54.9 2048 2628
+26  8 2447 1638 39.9 57.1  -8  848 65.3 1786 1776
+27  2 1416 2649 37.4 56.3 -22  684 43.8 2876 2524
+28  0 1503 1503 39.3 47.0  -9  875 53.5 2560 2241
+> summary(p3_1)
+       y                x1             x2             x3              x4              x5               x6               x7       
+ Min.   : 0.000   Min.   :1416   Min.   :1414   Min.   :35.10   Min.   :38.10   Min.   :-22.00   Min.   : 576.0   Min.   :43.80  
+ 1st Qu.: 4.000   1st Qu.:1896   1st Qu.:1714   1st Qu.:37.38   1st Qu.:52.42   1st Qu.: -5.75   1st Qu.: 710.5   1st Qu.:54.77  
+ Median : 6.500   Median :2111   Median :2106   Median :38.85   Median :57.70   Median :  1.00   Median : 787.5   Median :58.65  
+ Mean   : 6.964   Mean   :2110   Mean   :2127   Mean   :38.64   Mean   :59.40   Mean   :  0.00   Mean   : 789.9   Mean   :58.16  
+ 3rd Qu.:10.000   3rd Qu.:2303   3rd Qu.:2474   3rd Qu.:39.70   3rd Qu.:68.80   3rd Qu.:  6.25   3rd Qu.: 869.8   3rd Qu.:61.10  
+ Max.   :13.000   Max.   :2971   Max.   :2929   Max.   :42.30   Max.   :78.30   Max.   : 19.00   Max.   :1037.0   Max.   :67.50  
+       x8             x9      
+ Min.   :1457   Min.   :1575  
+ 1st Qu.:1848   1st Qu.:1913  
+ Median :2050   Median :2101  
+ Mean   :2110   Mean   :2128  
+ 3rd Qu.:2320   3rd Qu.:2328  
+ Max.   :2876   Max.   :2670  
+> 
+> #save graph in pdf
+> pdf(file="./Documents/Rutgers/RegressionAnalysis/Output/HW_06_fig.pdf")
+> pairs(~ y+x2+x7+x8, data=p3_1)
+> 
+> # Model Regression
+> lmod <- lm(y ~ x2 + x7 + x8, data = p3_1)
+> 
+> # Summary of the linear model
+> summary(lmod)
+
+Call:
+lm(formula = y ~ x2 + x7 + x8, data = p3_1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.0370 -0.7129 -0.2043  1.1101  3.7049 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -1.808372   7.900859  -0.229 0.820899    
+x2           0.003598   0.000695   5.177 2.66e-05 ***
+x7           0.193960   0.088233   2.198 0.037815 *  
+x8          -0.004816   0.001277  -3.771 0.000938 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.706 on 24 degrees of freedom
+Multiple R-squared:  0.7863,	Adjusted R-squared:  0.7596 
+F-statistic: 29.44 on 3 and 24 DF,  p-value: 3.273e-08
+
+> # ANOVA of the linear model
+> anova(lmod)
+Analysis of Variance Table
+
+Response: y
+          Df  Sum Sq Mean Sq F value    Pr(>F)    
+x2         1  76.193  76.193  26.172 3.100e-05 ***
+x7         1 139.501 139.501  47.918 3.698e-07 ***
+x8         1  41.400  41.400  14.221 0.0009378 ***
+Residuals 24  69.870   2.911                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> 
+> # a. Generate a Q-Q plot of the residuals
+> qqnorm(residuals(lmod), ylab = "Residuals", main = "Q-Q plot")
+> qqline(residuals(lmod))
+> 
+> # Does there seem to be any problem with the normality assumption?
+> # As observed from the Q-Q plot. although the central values have residuals
+> # approximated along the line, indicating a normal distribution; as the values 
+> # get higher, the residuals deviate due to possible outliers within the data
+> # However, considering this is not such a huge diveation, with only outliers having
+> # the exception, we can assume the residuals are normally distributed.
+> 
+> # b. Construct and interpret a plot of the residuals versus the predicted response.
+> # Calculate predicted values and residuals
+> predicted_values <- fitted(lmod)
+> residuals <- residuals(lmod)
+> 
+> # Plot the residuals versus the predicted values
+> plot(predicted_values, residuals, xlab = "Predicted Values", ylab = "Residuals", main = "Residuals vs Predicted Values")
+> abline(h = 0, col = "red")
+> 
+> # From the plot we can interpret that the predicted values are scattered in such a
+> # way that there are points which fall on zero residuals as well as some points 
+> # which looks like outliers based on large differences. Overall this model captures
+> # the relationship between the regressors and the response adequately based on the plot.
+> 
+> # c. Construct plots of the residuals versus each of the regressor variables. Do
+> # these plots imply that the regressor is correctly specified?
+> 
+> # Plot for x2
+> plot(p3_1$x2, residuals(lmod), xlab = "x2", ylab = "Residuals")
+> abline(h = 0)
+> 
+> # Plot for x7
+> plot(p3_1$x7, residuals(lmod), xlab = "x7", ylab = "Residuals")
+> abline(h = 0)
+> 
+> # PLot for x8
+> plot(p3_1$x8, residuals(lmod), xlab = "x8", ylab = "Residuals")
+> abline(h = 0)
+> 
+> # From the plot, we can notice that x2 and x8 are scattered around the residual
+> # line. So this suggests that the regressors are correctly specified. However for
+> # point x7 there seem to be a slight, the plot looks more of a skewed pattern 
+> # suggesting there could be problems with the model.
+> 
+> 
+> # d. Construct the partial regression plots for this model.
+> # Compare the plots with the plots of residuals versus regressors from part c above.
+> # Discuss the type of information provided by these plots.
+> 
+> avPlots(lmod, print_plot = TRUE)
+There were 21 warnings (use warnings() to see them)
+> 
+> # Quite similar to previous results, the plots for x2 and x8 are linear except the 
+> # are correlated in opposite slopes with y. In case of x7, the linearity is less
+> # but looking at the plot from this and c, the plot do not suggest any other curvature
+> # model in d, thus the predictor's effect is being correctly adjusted for by 
+> # the other predictors in the model.
+> 
+> 
+> # e.Compute the studentized residuals and the R-student residuals for this model.
+> # What information is conveyed by these scaled residuals?
+> 
+> # Compute studentized residuals
+> studentized_residuals <- ols_plot_resid_stand(lmod)$data
+> print(studentized_residuals)
+   obs        sdres   color fct_color txt
+1    1  2.231851618 outlier   outlier   1
+2    2  1.225616368  normal    normal  NA
+3    3  1.702625305  normal    normal  NA
+4    4  1.029767789  normal    normal  NA
+5    5  0.006124483  normal    normal  NA
+6    6 -0.418876221  normal    normal  NA
+7    7 -1.206836995  normal    normal  NA
+8    8  0.299328499  normal    normal  NA
+9    9  1.338032316  normal    normal  NA
+10  10 -1.441760607  normal    normal  NA
+11  11 -0.036468456  normal    normal  NA
+12  12  1.251090093  normal    normal  NA
+13  13 -0.083851688  normal    normal  NA
+14  14 -0.160668820  normal    normal  NA
+15  15 -1.335367350  normal    normal  NA
+16  16  0.644990078  normal    normal  NA
+17  17 -0.196937383  normal    normal  NA
+18  18 -0.365011749  normal    normal  NA
+19  19 -0.078998342  normal    normal  NA
+20  20 -0.206464327  normal    normal  NA
+21  21 -1.869940122  normal    normal  NA
+22  22  0.817274105  normal    normal  NA
+23  23 -0.551056514  normal    normal  NA
+24  24 -0.276544687  normal    normal  NA
+25  25 -1.018586104  normal    normal  NA
+26  26 -0.094055761  normal    normal  NA
+27  27 -0.262130195  normal    normal  NA
+28  28 -1.048746774  normal    normal  NA
+> 
+> # Compute R-student residuals
+> r_student_residuals <- ols_plot_resid_stud(lmod)$data
+> print(r_student_residuals)
+   obs          dsr  color fct_color txt
+1    1  2.454354223 normal    normal  NA
+2    2  1.239218310 normal    normal  NA
+3    3  1.777586702 normal    normal  NA
+4    4  1.031123075 normal    normal  NA
+5    5  0.005995537 normal    normal  NA
+6    6 -0.411563960 normal    normal  NA
+7    7 -1.218993620 normal    normal  NA
+8    8  0.293574644 normal    normal  NA
+9    9  1.361631132 normal    normal  NA
+10  10 -1.476806719 normal    normal  NA
+11  11 -0.035701602 normal    normal  NA
+12  12  1.266752172 normal    normal  NA
+13  13 -0.082098218 normal    normal  NA
+14  14 -0.157370596 normal    normal  NA
+15  15 -1.358701256 normal    normal  NA
+16  16  0.636954384 normal    normal  NA
+17  17 -0.192946834 normal    normal  NA
+18  18 -0.358322410 normal    normal  NA
+19  19 -0.077345090 normal    normal  NA
+20  20 -0.202296957 normal    normal  NA
+21  21 -1.980521136 normal    normal  NA
+22  22  0.811437522 normal    normal  NA
+23  23 -0.542899513 normal    normal  NA
+24  24 -0.271154408 normal    normal  NA
+25  25 -1.019417881 normal    normal  NA
+26  26 -0.092092392 normal    normal  NA
+27  27 -0.256979177 normal    normal  NA
+28  28 -1.051031132 normal    normal  NA
+> 
+> # These residuals help in identifying observations that do not fit well with the
+> # rest of the data. Observations with studentized residuals beyond ±2 or ±3 
+> # standard deviations from the mean are often potential outliers.
+> 
+> # Plot studentized residuals
+> plot(studentized_residuals, ylab = "Studentized Residuals", main = "Studentized Residuals")
+Error in plot.default(...) : 
+  formal argument "ylab" matched by multiple actual arguments
+> abline(h = c(-2, 2), col = "red", lty = 2)
+> 
+> # Plot R-student residuals
+> plot(r_student_residuals, ylab = "R-student Residuals", main = "R-student Residuals")
+Error in plot.default(...) : 
+  formal argument "ylab" matched by multiple actual arguments
+> abline(h = c(-2, 2), col = "red", lty = 2)
+> 
+> # These provide an even more sensitive measure of outliers and influential points.
+> # Large R-student residuals (beyond ±2 or ±3) suggest that the corresponding
+> # observations have a significant impact on the regression model
+> 
+> dev.off()
+null device 
+          1 
+> 
+> 
+> 

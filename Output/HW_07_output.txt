@@ -1,0 +1,229 @@
+> # HW_07.R based on problem 4.2
+> 
+> # Load necessary libraries
+> library(faraway)
+> library(olsrr)
+> 
+> # Load your data
+> ridge_data <- read.csv("Documents/Rutgers/RegressionAnalysis/Data/ridge_data.csv")
+> 
+> lmod = lm(y ~ x1 + x2 + x3 + x4 + x5 + x8 + x9 + x10, data = ridge_data)
+> 
+> # a. Forward Stepwise Selection
+> forward_model <- ols_step_forward_p(lmod)
+> forward_model
+
+
+                             Stepwise Summary                              
+-------------------------------------------------------------------------
+Step    Variable        AIC        SBC       SBIC        R2       Adj. R2 
+-------------------------------------------------------------------------
+ 0      Base Model    198.240    201.043    110.501    0.00000    0.00000 
+ 1      x1            157.342    161.545     72.450    0.76068    0.75213 
+ 2      x4            157.225    162.830     72.894    0.77698    0.76046 
+-------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.881       RMSE                 2.910 
+R-Squared               0.777       MSE                  9.409 
+Adj. R-Squared          0.760       Coef. Var           15.308 
+Pred R-Squared          0.715       AIC                157.225 
+MAE                     2.281       SBC                162.830 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                               ANOVA                                 
+--------------------------------------------------------------------
+                Sum of                                              
+               Squares        DF    Mean Square      F         Sig. 
+--------------------------------------------------------------------
+Regression     885.067         2        442.533    47.034    0.0000 
+Residual       254.038        27          9.409                     
+Total         1139.105        29                                    
+--------------------------------------------------------------------
+
+                                   Parameter Estimates                                    
+-----------------------------------------------------------------------------------------
+      model      Beta    Std. Error    Std. Beta      t        Sig       lower     upper 
+-----------------------------------------------------------------------------------------
+(Intercept)     7.179        18.788                  0.382    0.705    -31.370    45.729 
+         x1    -0.044         0.005       -0.825    -8.513    0.000     -0.055    -0.034 
+         x4     3.077         2.190        0.136     1.405    0.171     -1.417     7.571 
+-----------------------------------------------------------------------------------------
+
+> 
+> # Print the chosen model
+> print("Forward Stepwise Selection Chosen Model:")
+[1] "Forward Stepwise Selection Chosen Model:"
+> print(forward_model$model)
+
+Call:
+lm(formula = paste(response, "~", paste(preds, collapse = " + ")), 
+    data = l)
+
+Coefficients:
+(Intercept)           x1           x4  
+    7.17942     -0.04448      3.07723  
+
+> 
+> # b. Backward Stepwise Elimination
+> backward_model <- ols_step_backward_p(lmod)
+> backward_model
+
+
+                             Stepwise Summary                             
+------------------------------------------------------------------------
+Step    Variable        AIC        SBC       SBIC       R2       Adj. R2 
+------------------------------------------------------------------------
+ 0      Full Model    162.478    176.490    84.689    0.82190    0.75405 
+ 1      x4            160.491    173.102    81.836    0.82182    0.76513 
+ 2      x1            159.744    170.954    79.508    0.81422    0.76576 
+ 3      x9            158.606    168.414    77.220    0.80881    0.76898 
+ 4      x2            157.205    165.613    74.928    0.80495    0.77374 
+ 5      x3            155.426    162.432    72.475    0.80351    0.78084 
+------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.896       RMSE                 2.731 
+R-Squared               0.804       MSE                  8.609 
+Adj. R-Squared          0.781       Coef. Var           14.642 
+Pred R-Squared          0.736       AIC                155.426 
+MAE                     2.337       SBC                162.432 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                               ANOVA                                 
+--------------------------------------------------------------------
+                Sum of                                              
+               Squares        DF    Mean Square      F         Sig. 
+--------------------------------------------------------------------
+Regression     915.281         3        305.094     35.44    0.0000 
+Residual       223.824        26          8.609                     
+Total         1139.105        29                                    
+--------------------------------------------------------------------
+
+                                   Parameter Estimates                                    
+-----------------------------------------------------------------------------------------
+      model      Beta    Std. Error    Std. Beta      t        Sig       lower     upper 
+-----------------------------------------------------------------------------------------
+(Intercept)     4.590        11.772                  0.390    0.700    -19.607    28.788 
+         x5     2.597         1.265        0.219     2.054    0.050     -0.002     5.197 
+         x8     0.218         0.088        0.731     2.480    0.020      0.037     0.398 
+        x10    -0.009         0.002       -1.424    -4.757    0.000     -0.014    -0.005 
+-----------------------------------------------------------------------------------------
+
+> 
+> # Print the chosen model
+> print("Backward Stepwise Elimination Chosen Model:")
+[1] "Backward Stepwise Elimination Chosen Model:"
+> print(backward_model$model)
+
+Call:
+lm(formula = paste(response, "~", paste(c(include, cterms), collapse = " + ")), 
+    data = l)
+
+Coefficients:
+(Intercept)           x5           x8          x10  
+   4.590404     2.597240     0.217814    -0.009485  
+
+> 
+> # c. Bi-directional Stepwise Selection
+> both_model <- ols_step_both_p(lmod, print_plot=TRUE)
+> both_model
+
+
+                             Stepwise Summary                              
+-------------------------------------------------------------------------
+Step    Variable        AIC        SBC       SBIC        R2       Adj. R2 
+-------------------------------------------------------------------------
+ 0      Base Model    198.240    201.043    110.501    0.00000    0.00000 
+ 1      x1 (+)        157.342    161.545     72.450    0.76068    0.75213 
+-------------------------------------------------------------------------
+
+Final Model Output 
+------------------
+
+                         Model Summary                          
+---------------------------------------------------------------
+R                       0.872       RMSE                 3.014 
+R-Squared               0.761       MSE                  9.736 
+Adj. R-Squared          0.752       Coef. Var           15.571 
+Pred R-Squared          0.707       AIC                157.342 
+MAE                     2.401       SBC                161.545 
+---------------------------------------------------------------
+ RMSE: Root Mean Square Error 
+ MSE: Mean Square Error 
+ MAE: Mean Absolute Error 
+ AIC: Akaike Information Criteria 
+ SBC: Schwarz Bayesian Criteria 
+
+                               ANOVA                                 
+--------------------------------------------------------------------
+                Sum of                                              
+               Squares        DF    Mean Square      F         Sig. 
+--------------------------------------------------------------------
+Regression     866.495         1        866.495    88.999    0.0000 
+Residual       272.610        28          9.736                     
+Total         1139.105        29                                    
+--------------------------------------------------------------------
+
+                                  Parameter Estimates                                    
+----------------------------------------------------------------------------------------
+      model      Beta    Std. Error    Std. Beta      t        Sig      lower     upper 
+----------------------------------------------------------------------------------------
+(Intercept)    33.490         1.535                 21.811    0.000    30.345    36.635 
+         x1    -0.047         0.005       -0.872    -9.434    0.000    -0.057    -0.037 
+----------------------------------------------------------------------------------------
+
+> 
+> # Print the chosen model
+> print("Bi-directional Stepwise Selection Chosen Model:")
+[1] "Bi-directional Stepwise Selection Chosen Model:"
+> print(both_model$model)
+
+Call:
+lm(formula = paste(response, "~", paste(preds, collapse = " + ")), 
+    data = l)
+
+Coefficients:
+(Intercept)           x1  
+   33.49001     -0.04703  
+
+> 
+> # d. All Possible Regressions
+> all_models <- ols_step_all_possible(model = lm(y ~ x1 + x2 + x3 + x4 + x5 + x8, data = ridge_data))
+> ols_step_all_possible
+function (model, ...) 
+UseMethod("ols_step_all_possible")
+<bytecode: 0x1680b7f90>
+<environment: namespace:olsrr>
+> 
+> # Choosing the best model using Adjusted R-Squared
+> best_model <- all_models$models[which.max(all_models$adjr), ]
+> 
+> # Print the chosen best model
+> print("Best Model among All Possible Regressions (based on Adjusted R-Squared):")
+[1] "Best Model among All Possible Regressions (based on Adjusted R-Squared):"
+> print(best_model)
+NULL
+> 
+> dev.off()
+Error in dev.off() : cannot shut down device 1 (the null device)
+> 
+> 
